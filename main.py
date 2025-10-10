@@ -1,6 +1,9 @@
-def main():
-    print("Hello from coin-conversion-api!")
+from fastapi import FastAPI
+
+app = FastAPI()
 
 
-if __name__ == "__main__":
-    main()
+@app.get("/hello-world")
+def hello_world():
+    return {"message": "Hello, World!"}
+
