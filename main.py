@@ -5,6 +5,9 @@ app = FastAPI()
 app.include_router(router)
 
 
+#path paramerter 
+# query parameter
+# body parameter
 
 
 @app.get("/hello-world")
