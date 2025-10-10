@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Query, Path
+from fastapi import APIRouter, Path
 from convert import sync_converter, async_converter
-from typing import Any, Annotated
+from typing import Any
 from asyncio import gather
+from schemas import ConvertInput
 
 
 router = APIRouter()
@@ -11,16 +12,15 @@ router = APIRouter(prefix='/converter')
 
 @router.get('/{from_currency}')
 def convert(
+        body: ConvertInput,
         from_currency: str = Path(..., min_length=3, max_length=3, description="Currency code (e.g., USD, EUR)", pattern="^[A-Z]{3}$"), 
-        price: float = Query(..., gt=0, description="Amount to convert"), 
-        to_currencies: list[Annotated[str, Query(min_length=3, max_length=3, pattern="^[A-Z]{3}$")]] = Query(default=['USD'], min_length=1, max_length=5, description="List of target currency codes")
     ) -> list[Any]:
     result: list[Any] = []
-    for currency in to_currencies:
+    for currency in body.to_currencies:
         response = sync_converter(
             from_currency = from_currency, 
             to_currency= currency, 
-            price = price
+            price = body.price
         )
 
         result.append(response)
@@ -29,16 +29,15 @@ def convert(
 
 @router.get('/async/{from_currency}')
 async def async_convert(
+        body: ConvertInput,
         from_currency: str = Path(..., min_length=3, max_length=3, description="Currency code (e.g., USD, EUR)", pattern="^[A-Z]{3}$"),
-        price: float = Query(..., gt=0, description="Amount to convert"), 
-        to_currencies: list[Annotated[str, Query(min_length=3, max_length=3, pattern="^[A-Z]{3}$")]] = Query(default=['USD'], min_length=1, max_length=5, description="List of target currency codes")
     ) -> list[Any]:
     coroutines: list[Any] = []
-    for currency in to_currencies:
+    for currency in body.to_currencies:
         coro =  async_converter(
             from_currency = from_currency, 
             to_currency= currency, 
-            price = price
+            price = body.price
         )
 
         coroutines.append(coro)
