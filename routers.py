@@ -5,12 +5,9 @@ from asyncio import gather
 from schemas import ConvertInput
 
 
-router = APIRouter()
+router: APIRouter = APIRouter(prefix='/converter')
 
-
-router = APIRouter(prefix='/converter')
-
-@router.get('/{from_currency}')
+@router.post('/{from_currency}')
 def convert(
         body: ConvertInput,
         from_currency: str = Path(..., min_length=3, max_length=3, description="Currency code (e.g., USD, EUR)", pattern="^[A-Z]{3}$"), 
@@ -27,7 +24,7 @@ def convert(
 
     return result
 
-@router.get('/async/{from_currency}')
+@router.post('/async/{from_currency}')
 async def async_convert(
         body: ConvertInput,
         from_currency: str = Path(..., min_length=3, max_length=3, description="Currency code (e.g., USD, EUR)", pattern="^[A-Z]{3}$"),
